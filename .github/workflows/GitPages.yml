@@ -36,15 +36,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - name: Install dependencies
-      # Using npm ci is generally faster than running npm i because it caches dependencies
-      run: |
-        npm ci
-        working-directory: ./server
+    - name: Install Dependencies
+        run: |
+          cd todo
+          npm install
     - name: Build the app
       run: |
-        npm run build
-        working-directory: ./server
+          cd todo
+          npm run build
     - name: Run component tests
       run: |
         npm run test
