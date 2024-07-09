@@ -1,47 +1,23 @@
-name: S3 Static-Web-Hosting Name
+name: Deploy to S3
 
 on:
   push:
     branches:
-      - main
+      - main  # Set this to the branch you want to deploy from
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
-      - name: Archive build
-        uses: actions/upload-artifact@v1
-        with:
-          name: dist
-          path: dist/boon12
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Download build
-        uses: actions/download-artifact@v1
-        with:
-          name: dist
-      - name: Set AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_PROD_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_PROD_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
-      - name: Sync files to S3 bucket
-        run: aws s3 cp dist s3://boon12 --recursive
+    - uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1  # e.g. eu-west-1
+
+    - name: Sync files to S3
+      run: aws s3 sync . s3://boon12 --delete
